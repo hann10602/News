@@ -1,12 +1,12 @@
 export type CategoryType = {
-  id: number;
+  id: string;
   name: string;
   code: string;
-  productQuantity?: number
+  productQuantity?: number;
 };
 
 export type GetCategoryType = {
-  id: number;
+  id: string;
 };
 
 export type CreateCategoryType = {
@@ -15,7 +15,7 @@ export type CreateCategoryType = {
 };
 
 export type UpdateCategoryType = {
-  id: number;
+  id: string;
   name: string;
   code: string;
 };

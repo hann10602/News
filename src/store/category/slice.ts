@@ -51,7 +51,7 @@ const categorySlice = createSlice({
         state.isGettingCategories = true;
       })
       .addCase(categoryAsyncAction.getAll.fulfilled, (state, action) => {
-        state.categories = action.payload || [];
+        state.categories = action.payload as CategoryType[];
 
         state.isGettingCategories = false;
       })

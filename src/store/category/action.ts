@@ -1,3 +1,4 @@
+import { db } from "@/config/firebase";
 import {
   CreateCategoryType,
   DeleteCategoryType,
@@ -5,26 +6,23 @@ import {
   UpdateCategoryType,
 } from "@/store/category/type";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { db } from "@/config/firebase";
-import { getDocs, collection } from "firebase/firestore";
+import { collection, doc, getDocs, query, where, onSnapshot } from "firebase/firestore";
 
 const dbCollection = collection(db, "category");
+
+const categoryDoc = (id: string) => {
+  return doc(dbCollection, "category", id)
+} 
 
 const getOne = createAsyncThunk(
   "category/self",
   async (param: GetCategoryType, { rejectWithValue }) => {
     try {
-      // const resp = await baseAxios
-      //   .get(`/category/self/${param.id}`)
-      //   .then((res) => res)
-      //   .catch((err) => err);
-      // if (resp.code === "ERR_NETWORK") {
-      //   return rejectWithValue(resp);
-      // } else if (resp.status === 200) {
-      //   return resp.data;
-      // } else if (resp.code !== "ERR_NETWORK") {
-      //   return rejectWithValue(resp);
-      // }
+      const data = await getDocs(dbCollection)
+        .then((res) => res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+        .catch((err) => rejectWithValue(err));
+
+      return data;
     } catch (err) {
       return rejectWithValue(err);
     }
@@ -35,9 +33,11 @@ const getAll = createAsyncThunk(
   "category/get-all",
   async (param, { rejectWithValue }) => {
     try {
-      await getDocs(dbCollection)
-        .then((res) => res)
+      const data = await getDocs(dbCollection)
+        .then((res) => res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
         .catch((err) => rejectWithValue(err));
+
+      return data;
     } catch (err) {
       return rejectWithValue(err);
     }
@@ -48,17 +48,13 @@ const create = createAsyncThunk(
   "category/create",
   async (param: CreateCategoryType, { rejectWithValue }) => {
     try {
-      // const resp = await baseAxios
-      //   .post(`/category/create`, param)
-      //   .then((res) => res)
-      //   .catch((err) => err);
-      // if (resp.code === "ERR_NETWORK") {
-      //   return rejectWithValue(resp);
-      // } else if (resp.status === 200) {
-      //   return resp.data;
-      // } else if (resp.code !== "ERR_NETWORK") {
-      //   return rejectWithValue(resp);
-      // }
+      const existCategory = query(dbCollection, where("code", "==", param.code));
+      console.log(existCategory)
+      // const data = 
+      //   .then((res) => res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+      //   .catch((err) => rejectWithValue(err));
+
+      // return data;
     } catch (err) {
       return rejectWithValue(err);
     }
@@ -69,17 +65,6 @@ const update = createAsyncThunk(
   "category/update",
   async (param: UpdateCategoryType, { rejectWithValue }) => {
     try {
-      // const resp = await baseAxios
-      //   .put(`/category/update`, param)
-      //   .then((res) => res)
-      //   .catch((err) => err);
-      // if (resp.code === "ERR_NETWORK") {
-      //   return rejectWithValue(resp);
-      // } else if (resp.status === 200) {
-      //   return resp.data;
-      // } else if (resp.code !== "ERR_NETWORK") {
-      //   return rejectWithValue(resp);
-      // }
     } catch (err) {
       return rejectWithValue(err);
     }
@@ -90,17 +75,6 @@ const deletes = createAsyncThunk(
   "category/delete",
   async (param: DeleteCategoryType, { rejectWithValue }) => {
     try {
-      // const resp = await baseAxios
-      //   .delete(`/category/delete/${param.id}`)
-      //   .then((res) => res)
-      //   .catch((err) => err);
-      // if (resp.code === "ERR_NETWORK") {
-      //   return rejectWithValue(resp);
-      // } else if (resp.status === 200) {
-      //   return resp.data;
-      // } else if (resp.code !== "ERR_NETWORK") {
-      //   return rejectWithValue(resp);
-      // }
     } catch (err) {
       return rejectWithValue(err);
     }
