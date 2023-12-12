@@ -2,8 +2,8 @@ export type NewsType = {
   id: string;
   title: string;
   content: string;
-  category_id: string;
-  created_date: string;
+  createdDate: string;
+  categoryId: string;
 };
 
 export type GetNewsType = {
@@ -11,14 +11,18 @@ export type GetNewsType = {
 };
 
 export type CreateNewsType = {
-  name: string;
-  code: string;
+  title: string;
+  content: string;
+  createdDate: string;
+  categoryId: string;
 };
 
 export type UpdateNewsType = {
   id: string;
-  name: string;
-  code: string;
+  title: string;
+  content: string;
+  createdDate: string;
+  categoryId: string;
 };
 
 export type DeleteNewsType = GetNewsType;

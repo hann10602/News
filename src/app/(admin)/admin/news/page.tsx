@@ -1,18 +1,18 @@
 "use client";
-import CategoryModal from "@/components/Modal/CategoryModal/CategoryModal";
+import DeleteModal from "@/components/Modal/DeleteModal/DeleteModal";
+import NewsModal from "@/components/Modal/NewsModal/NewsModal";
 import TableSkeleton from "@/components/Skeleton/TableSkeleton";
-import { categoryAsyncAction } from "@/store/category/action";
+import { newsAsyncAction } from "@/store/news/action";
 import {
-  categoriesSelector,
-  isGettingCategoriesSelector,
-} from "@/store/category/selector";
-import { CategoryType } from "@/store/category/type";
+  isGettingNewsListSelector,
+  newsListSelector,
+} from "@/store/news/selector";
+import { NewsType } from "@/store/news/type";
 import { useAppDispatch } from "@/store/store";
 import { failedNotify, successNotify } from "@/utils/utils";
 import {
   Box,
   Button,
-  Modal,
   Paper,
   Table,
   TableBody,
@@ -24,23 +24,22 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import DeleteModal from "@/components/Modal/DeleteModal/DeleteModal";
+import "react-toastify/dist/ReactToastify.css";
 
 type Props = {};
 
 const Page = (props: Props) => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
-  const [category, setCategory] = useState<CategoryType | undefined>(undefined);
+  const [news, setNews] = useState<NewsType | undefined>(undefined);
   const [page, setPage] = useState<number>(0);
   const [isEditPageOpen, setIsEditPageOpen] = useState<boolean>(false);
   const [isDeletePageOpen, setIsDeletePageOpen] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
 
-  const categories = useSelector(categoriesSelector);
-  const isGettingCategories = useSelector(isGettingCategoriesSelector);
+  const newsList = useSelector(newsListSelector);
+  const isGettingNewsList = useSelector(isGettingNewsListSelector);
 
   const handlePageChange = (e: unknown, page: number) => {
     setPage(page);
@@ -49,23 +48,23 @@ const Page = (props: Props) => {
   const handleClosePage = () => {
     setIsEditPageOpen(false);
     setIsDeletePageOpen(false);
-    setCategory(undefined);
+    setNews(undefined);
   };
 
   const handleSuccessfully = () => {
-    dispatch(categoryAsyncAction.getAll());
+    dispatch(newsAsyncAction.getAll());
     setIsEditPageOpen(false);
-    setCategory(undefined);
+    setNews(undefined);
     successNotify("Success");
   };
 
-  const handleDeleteCategory = () => {
-    if (category) {
-      dispatch(categoryAsyncAction.deletes({ id: category.id }))
+  const handleDeleteNews = () => {
+    if (news) {
+      dispatch(newsAsyncAction.deletes({ id: news.id }))
         .then(() => {
-          dispatch(categoryAsyncAction.getAll());
+          dispatch(newsAsyncAction.getAll());
           setIsDeletePageOpen(false);
-          setCategory(undefined);
+          setNews(undefined);
           successNotify("Success");
         })
         .catch((err) => {
@@ -79,7 +78,7 @@ const Page = (props: Props) => {
   };
 
   useEffect(() => {
-    dispatch(categoryAsyncAction.getAll());
+    dispatch(newsAsyncAction.getAll());
   }, []);
 
   return (
@@ -104,7 +103,7 @@ const Page = (props: Props) => {
       >
         Add
       </Button>
-      {isGettingCategories ? (
+      {isGettingNewsList ? (
         <TableSkeleton length={10} />
       ) : (
         <Box sx={{ width: "100%" }}>
@@ -123,14 +122,14 @@ const Page = (props: Props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {categories
+                  {newsList
                     .slice(page * rowsPerPage, rowsPerPage * (page + 1))
-                    .map((category) => (
-                      <TableRow key={category.id}>
-                        <TableCell align="center">{category.id}</TableCell>
-                        <TableCell align="center">{category.name}</TableCell>
-                        <TableCell align="center">{category.code}</TableCell>
-                        <TableCell align="center">{category.name}</TableCell>
+                    .map((news) => (
+                      <TableRow key={news.id}>
+                        <TableCell align="center">{news.id}</TableCell>
+                        <TableCell align="center">{news.title}</TableCell>
+                        <TableCell align="center">{news.categoryId}</TableCell>
+                        <TableCell align="center">{news.createdDate}</TableCell>
                         <TableCell
                           align="center"
                           className="w-48 flex items-center justify-center space-x-2"
@@ -139,7 +138,7 @@ const Page = (props: Props) => {
                             variant="contained"
                             className="w-16 bg-green-400 hover:bg-green-300"
                             onClick={() => {
-                              setCategory(category);
+                              setNews(news);
                               setIsEditPageOpen(true);
                             }}
                           >
@@ -149,7 +148,7 @@ const Page = (props: Props) => {
                             variant="contained"
                             className="w-16 bg-red-400 hover:bg-red-300"
                             onClick={() => {
-                              setCategory(category);
+                              setNews(news);
                               setIsDeletePageOpen(true);
                             }}
                           >
@@ -166,25 +165,25 @@ const Page = (props: Props) => {
               rowsPerPage={rowsPerPage}
               component="div"
               onRowsPerPageChange={handleRowsPerPageChange}
-              count={categories.length}
+              count={newsList.length}
               onPageChange={handlePageChange}
               page={page}
             />
           </Paper>
         </Box>
       )}
-      <CategoryModal
-        item={category}
+      <NewsModal
+        item={news}
         isOpen={isEditPageOpen}
         onClose={handleClosePage}
         onSuccess={handleSuccessfully}
       />
-      {category && (
+      {news && (
         <DeleteModal
-          title={`Are you sure to delete ${category.name} category ?`}
+          title={`Are you sure to delete this news ?`}
           isOpen={isDeletePageOpen}
           onClose={handleClosePage}
-          handleDelete={handleDeleteCategory}
+          handleDelete={handleDeleteNews}
         />
       )}
     </div>

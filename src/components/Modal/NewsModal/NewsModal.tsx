@@ -1,6 +1,6 @@
 "use client";
-import { categoryAsyncAction } from "@/store/category/action";
-import { CategoryType } from "@/store/category/type";
+import { newsAsyncAction } from "@/store/news/action";
+import { NewsType } from "@/store/news/type";
 import { useAppDispatch } from "@/store/store";
 import { failedNotify } from "@/utils/utils";
 import { CloseRounded } from "@mui/icons-material";
@@ -17,13 +17,13 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type Props = {
-  item?: CategoryType;
+  item?: NewsType;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 };
 
-const CategoryModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
+const NewsModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
   const { handleSubmit, control, reset } = useForm();
 
   const dispatch = useAppDispatch();
@@ -32,10 +32,12 @@ const CategoryModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
     try {
       if (item) {
         dispatch(
-          categoryAsyncAction.update({
+          newsAsyncAction.update({
             id: item.id,
-            name: e.name,
-            code: e.code,
+            title: e.title,
+            content: e.content,
+            categoryId: e.categoryId,
+            createdDate: e.createdDate,
           })
         )
           .then(() => {
@@ -47,9 +49,11 @@ const CategoryModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
           });
       } else {
         dispatch(
-          categoryAsyncAction.create({
-            name: e.name,
-            code: e.code,
+          newsAsyncAction.create({
+            title: e.title,
+            content: e.content,
+            categoryId: e.categoryId,
+            createdDate: e.createdDate,
           })
         )
           .then(() => {
@@ -92,20 +96,29 @@ const CategoryModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
             </span>
           </div>
           <FormControl className="w-full mt-10">
-            <InputLabel>Name:</InputLabel>
+            <InputLabel>Title:</InputLabel>
             <Controller
-              name="name"
+              name="title"
               control={control}
-              defaultValue={item?.name || ""}
+              defaultValue={item?.title || ""}
               render={({ field }) => <Input type="text" required {...field} />}
             />
           </FormControl>
           <FormControl className="w-full mt-10">
-            <InputLabel>Code:</InputLabel>
+            <InputLabel>Content:</InputLabel>
             <Controller
-              name="code"
+              name="content"
               control={control}
-              defaultValue={item?.code || ""}
+              defaultValue={item?.content || ""}
+              render={({ field }) => <Input type="text" required {...field} />}
+            />
+          </FormControl>
+          <FormControl className="w-full mt-10">
+            <InputLabel>category:</InputLabel>
+            <Controller
+              name="category"
+              control={control}
+              defaultValue={item?.categoryId || ""}
               render={({ field }) => <Input type="text" required {...field} />}
             />
           </FormControl>
@@ -136,4 +149,4 @@ const CategoryModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
   );
 };
 
-export default CategoryModal;
+export default NewsModal;
