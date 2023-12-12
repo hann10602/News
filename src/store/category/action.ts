@@ -1,4 +1,4 @@
-import { db } from "@/config/firebase";
+import { categoryCollection, db, newsCollection } from "@/config/firebase";
 import {
   CategoryType,
   CreateCategoryType,
@@ -16,18 +16,17 @@ import {
   onSnapshot,
   addDoc,
 } from "firebase/firestore";
-
-const dbCollection = collection(db, "category");
+import { NewsType } from "../news/type";
 
 const categoryDoc = (id: string) => {
-  return doc(dbCollection, "category", id);
+  return doc(categoryCollection, "category", id);
 };
 
 const getOne = createAsyncThunk(
   "category/self",
   async (param: GetCategoryType, { rejectWithValue }) => {
     try {
-      const data = await getDocs(dbCollection)
+      const data = await getDocs(categoryCollection)
         .then((res) => res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
         .catch((err) => rejectWithValue(err));
 
@@ -42,7 +41,7 @@ const getAll = createAsyncThunk(
   "category/get-all",
   async (param, { rejectWithValue }) => {
     try {
-      const data = await getDocs(dbCollection)
+      const data = await getDocs(categoryCollection)
         .then((res) => res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
         .catch((err) => rejectWithValue(err));
 
@@ -57,7 +56,7 @@ const create = createAsyncThunk(
   "category/create",
   async (param: CreateCategoryType, { rejectWithValue }) => {
     try {
-      const q = query(dbCollection, where("code", "==", param.code));
+      const q = query(categoryCollection, where("code", "==", param.code));
       const data = await new Promise((resolve, reject) => {
         onSnapshot(q, (snapshot) => {
           const categories: CategoryType[] = [];
@@ -70,7 +69,7 @@ const create = createAsyncThunk(
       })
         .then((res) => {
           if ((res as CategoryType[]).length === 0) {
-            addDoc(dbCollection, {
+            addDoc(categoryCollection, {
               name: param.name,
               code: param.code,
             }).catch(() => rejectWithValue("Add category failed"));
@@ -101,6 +100,27 @@ const deletes = createAsyncThunk(
   "category/delete",
   async (param: DeleteCategoryType, { rejectWithValue }) => {
     try {
+      const q = query(newsCollection, where("category_id", "==", param.id));
+      const data = await new Promise((resolve, reject) => {
+        onSnapshot(q, (snapshot) => {
+          const news: NewsType[] = [];
+          snapshot.docs.forEach((doc) => {
+            news.push({ ...doc.data(), id: doc.id } as NewsType);
+          });
+
+          console.log(news);
+        });
+      })
+        .then((res) => {
+          if ((res as NewsType[]).length === 0) {
+            console.log("length = 0");
+          } else {
+            return rejectWithValue("This category exist news");
+          }
+        })
+        .catch(() => rejectWithValue("Delete category failed"));
+
+      return data;
     } catch (err) {
       return rejectWithValue(err);
     }
