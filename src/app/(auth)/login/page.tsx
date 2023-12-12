@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/config/firebase";
 import Link from "next/link";
+import "react-toastify/dist/ReactToastify.css";
 import { failedNotify } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "react-toastify";

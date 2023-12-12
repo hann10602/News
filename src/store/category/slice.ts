@@ -34,7 +34,7 @@ const categorySlice = createSlice({
         state.isGettingCategory = true;
       })
       .addCase(categoryAsyncAction.getOne.fulfilled, (state, action) => {
-        state.category = action.payload;
+        // state.category = action.payload;
         state.isGettingCategory = false;
       })
       .addCase(categoryAsyncAction.getOne.rejected, (state, err: any) => {
@@ -69,51 +69,33 @@ const categorySlice = createSlice({
         state.isCreatingCategory = true;
       })
       .addCase(categoryAsyncAction.create.fulfilled, (state, action) => {
-        state.response = action.payload;
         state.isCreatingCategory = false;
       })
       .addCase(categoryAsyncAction.create.rejected, (state, err: any) => {
         state.isCreatingCategory = false;
-        if (err.payload.code === "ERR_NETWORK") {
-          localStorage.removeItem("jwt");
-          throw new Error(err.payload.code as string);
-        } else {
-          throw new Error(err.payload.code as string);
-        }
+        throw new Error(err.payload as string);
       });
     builder
       .addCase(categoryAsyncAction.update.pending, (state) => {
         state.isUpdatingCategory = true;
       })
       .addCase(categoryAsyncAction.update.fulfilled, (state, action) => {
-        state.response = action.payload;
         state.isUpdatingCategory = false;
       })
       .addCase(categoryAsyncAction.update.rejected, (state, err: any) => {
         state.isUpdatingCategory = false;
-        if (err.payload.code === "ERR_NETWORK") {
-          localStorage.removeItem("jwt");
-          throw new Error(err.payload.code as string);
-        } else {
-          throw new Error(err.payload.code as string);
-        }
+        throw new Error(err.payload as string);
       });
     builder
       .addCase(categoryAsyncAction.deletes.pending, (state) => {
         state.isDeletingCategory = true;
       })
       .addCase(categoryAsyncAction.deletes.fulfilled, (state, action) => {
-        state.response = action.payload;
         state.isDeletingCategory = false;
       })
       .addCase(categoryAsyncAction.deletes.rejected, (state, err: any) => {
         state.isDeletingCategory = false;
-        if (err.payload.code === "ERR_NETWORK") {
-          localStorage.removeItem("jwt");
-          throw new Error(err.payload.code as string);
-        } else {
-          throw new Error(err.payload.code as string);
-        }
+        throw new Error(err.payload as string);
       });
   },
 });

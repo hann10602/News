@@ -8,6 +8,7 @@ import {
 } from "@/store/category/selector";
 import { CategoryType } from "@/store/category/type";
 import { useAppDispatch } from "@/store/store";
+import { successNotify } from "@/utils/utils";
 import {
   Box,
   Button,
@@ -23,6 +24,8 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 type Props = {};
 
@@ -47,6 +50,13 @@ const Page = (props: Props) => {
     setCategory(undefined);
   };
 
+  const handleSuccessfully = () => {
+    dispatch(categoryAsyncAction.getAll());
+    setIsEditPageOpen(false);
+    setCategory(undefined);
+    successNotify("Success");
+  };
+
   const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(Number(e.target.value));
   };
@@ -57,8 +67,20 @@ const Page = (props: Props) => {
 
   return (
     <div className="py-10 px-14">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Button
-        className="mb-8 px-8 py-2"
+        className="mb-8 px-10 py-2 bg-[#3d8bd9]"
         variant="contained"
         color="primary"
         onClick={() => setIsEditPageOpen(true)}
@@ -137,7 +159,8 @@ const Page = (props: Props) => {
       <CategoryModal
         item={category}
         isOpen={isEditPageOpen}
-        onClose={() => setIsEditPageOpen(false)}
+        onClose={handleCloseEditPage}
+        onSuccess={handleSuccessfully}
       />
       {isDeletePageOpen && (
         <Modal open={isDeletePageOpen}>
