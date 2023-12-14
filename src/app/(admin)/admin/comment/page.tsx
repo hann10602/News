@@ -1,5 +1,6 @@
 "use client";
 import CategoryModal from "@/components/Modal/CategoryModal/CategoryModal";
+import DeleteModal from "@/components/Modal/DeleteModal/DeleteModal";
 import TableSkeleton from "@/components/Skeleton/TableSkeleton";
 import { categoryAsyncAction } from "@/store/category/action";
 import {
@@ -12,7 +13,6 @@ import { failedNotify, successNotify } from "@/utils/utils";
 import {
   Box,
   Button,
-  Modal,
   Paper,
   Table,
   TableBody,
@@ -20,13 +20,12 @@ import {
   TableContainer,
   TableHead,
   TablePagination,
-  TableRow,
+  TableRow
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import DeleteModal from "@/components/Modal/DeleteModal/DeleteModal";
+import "react-toastify/dist/ReactToastify.css";
 
 type Props = {};
 

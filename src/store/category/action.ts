@@ -1,27 +1,21 @@
-import { categoryCollection, db, newsCollection } from "@/config/firebase";
+import { categoryCollection, categoryDoc, newsCollection } from "@/config/firebase";
 import {
   CategoryType,
   CreateCategoryType,
   DeleteCategoryType,
-  GetCategoryType,
-  UpdateCategoryType,
+  UpdateCategoryType
 } from "@/store/category/type";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
-  doc,
-  getDocs,
-  query,
-  where,
-  onSnapshot,
   addDoc,
   deleteDoc,
+  getDocs,
+  onSnapshot,
+  query,
   updateDoc,
+  where
 } from "firebase/firestore";
 import { NewsType } from "../news/type";
-
-const categoryDoc = (id: string) => {
-  return doc(db, "category", id);
-};
 
 const getAll = createAsyncThunk(
   "category/get-all",

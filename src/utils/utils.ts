@@ -1,9 +1,9 @@
 import { toast } from "react-toastify";
 
 export const failedNotify = (message: string) => {
-    toast.error(message);
+  toast.error(message);
 };
 
 export const successNotify = (message: string) => {
-    toast.success(message);
+  toast.success(message);
 };

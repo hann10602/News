@@ -1,21 +1,14 @@
-import { db, newsCollection } from "@/config/firebase";
+import { categoryDoc, newsCollection, newsDoc } from "@/config/firebase";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { format } from "date-fns";
 import {
   addDoc,
   deleteDoc,
-  doc,
+  getDoc,
   getDocs,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
-import {
-  CreateNewsType,
-  DeleteNewsType,
-  UpdateNewsType
-} from "../news/type";
-
-const newsDoc = (id: string) => {
-  return doc(db, "news", id);
-};
+import { CreateNewsType, DeleteNewsType, UpdateNewsType } from "../news/type";
 
 const getOne = createAsyncThunk(
   "news/self",
@@ -37,8 +30,26 @@ const getAll = createAsyncThunk(
   async (param, { rejectWithValue }) => {
     try {
       const data = await getDocs(newsCollection)
-        .then((res) => res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+        .then((res) =>
+          res.docs.map((doc) => {
+            const category = getDoc(categoryDoc(doc.data().category_id)).then(
+              (res) => res.data()?.name
+            );
+
+            return {
+              id: doc.id,
+              category: category,
+              createdDate: format(
+                doc.data().created_date.toDate(),
+                "dd/MM/yyyy"
+              ),
+              ...doc.data(),
+            };
+          })
+        )
         .catch((err) => rejectWithValue(err));
+
+      console.log(data);
 
       return data;
     } catch (err) {

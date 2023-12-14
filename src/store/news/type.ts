@@ -3,6 +3,7 @@ export type NewsType = {
   title: string;
   content: string;
   createdDate: string;
+  category: string;
   categoryId: string;
 };
 

@@ -2,6 +2,7 @@
 import DeleteModal from "@/components/Modal/DeleteModal/DeleteModal";
 import NewsModal from "@/components/Modal/NewsModal/NewsModal";
 import TableSkeleton from "@/components/Skeleton/TableSkeleton";
+import { categoryAsyncAction } from "@/store/category/action";
 import { newsAsyncAction } from "@/store/news/action";
 import {
   isGettingNewsListSelector,
@@ -79,6 +80,7 @@ const Page = (props: Props) => {
 
   useEffect(() => {
     dispatch(newsAsyncAction.getAll());
+    dispatch(categoryAsyncAction.getAll());
   }, []);
 
   return (
@@ -113,9 +115,9 @@ const Page = (props: Props) => {
                 <TableHead>
                   <TableRow>
                     <TableCell align="center">Id</TableCell>
-                    <TableCell align="center">Name</TableCell>
-                    <TableCell align="center">Code</TableCell>
-                    <TableCell align="center">Product quantity</TableCell>
+                    <TableCell align="center">Title</TableCell>
+                    <TableCell align="center">Category</TableCell>
+                    <TableCell align="center">Created Date</TableCell>
                     <TableCell align="center" className="w-48">
                       Options
                     </TableCell>
@@ -128,7 +130,7 @@ const Page = (props: Props) => {
                       <TableRow key={news.id}>
                         <TableCell align="center">{news.id}</TableCell>
                         <TableCell align="center">{news.title}</TableCell>
-                        <TableCell align="center">{news.categoryId}</TableCell>
+                        <TableCell align="center">{news.category}</TableCell>
                         <TableCell align="center">{news.createdDate}</TableCell>
                         <TableCell
                           align="center"

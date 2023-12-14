@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { collection, getFirestore } from "firebase/firestore";
+import { collection, doc, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB_64BY2gXSepcumcjreUVVaQ1vRwKM2Gw",
@@ -20,3 +20,11 @@ export const db = getFirestore(app);
 
 export const categoryCollection = collection(db, "category");
 export const newsCollection = collection(db, "news");
+
+export const categoryDoc = (id: string) => {
+  return doc(db, "category", id);
+};
+
+export const newsDoc = (id: string) => {
+  return doc(db, "news", id);
+};
