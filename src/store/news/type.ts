@@ -1,3 +1,5 @@
+import { FieldValue } from "firebase/firestore";
+
 export type NewsType = {
   id: string;
   title: string;
@@ -14,7 +16,7 @@ export type GetNewsType = {
 export type CreateNewsType = {
   title: string;
   content: string;
-  createdDate: string;
+  createdDate: FieldValue;
   categoryId: string;
 };
 
@@ -22,7 +24,7 @@ export type UpdateNewsType = {
   id: string;
   title: string;
   content: string;
-  createdDate: string;
+  createdDate: FieldValue;
   categoryId: string;
 };
 

@@ -106,11 +106,11 @@ const Page = (props: Props) => {
           </div>
           <div className="w-[45%] h-0.5 bg-gray-300"></div>
         </div>
-        <div
-          className="w-full mt-5 flex items-center justify-center cursor-pointer"
-          onClick={() => signInWithGoogle()}
-        >
-          <div className="w-10 h-10 flex justify-center items-center text-3xl font-extrabold text-red-500 border-2 border-solid border-red-500 rounded-full">
+        <div className="w-full mt-5 flex items-center justify-center">
+          <div
+            className="w-10 h-10 flex justify-center items-center text-3xl font-extrabold text-red-500 border-2 border-solid border-red-500 rounded-full cursor-pointer"
+            onClick={() => signInWithGoogle()}
+          >
             G
           </div>
         </div>

@@ -32,24 +32,24 @@ const getAll = createAsyncThunk(
       const data = await getDocs(newsCollection)
         .then((res) =>
           res.docs.map((doc) => {
-            const category = getDoc(categoryDoc(doc.data().category_id)).then(
+            const category = getDoc(categoryDoc(doc.data().categoryId)).then(
               (res) => res.data()?.name
             );
 
             return {
               id: doc.id,
               category: category,
+              title: doc.data().title,
+              content: doc.data().content,
+              categoryId: doc.data().categoryId,
               createdDate: format(
-                doc.data().created_date.toDate(),
+                doc.data().createdDate.toDate(),
                 "dd/MM/yyyy"
               ),
-              ...doc.data(),
             };
           })
         )
         .catch((err) => rejectWithValue(err));
-
-      console.log(data);
 
       return data;
     } catch (err) {
@@ -65,8 +65,8 @@ const create = createAsyncThunk(
       return addDoc(newsCollection, {
         title: param.title,
         content: param.content,
-        category_id: param.categoryId,
-        created_date: param.createdDate,
+        categoryId: param.categoryId,
+        createdDate: param.createdDate,
       }).catch(() => rejectWithValue("Add news failed"));
     } catch (err) {
       return rejectWithValue("Add news failed");
@@ -81,8 +81,8 @@ const update = createAsyncThunk(
       return updateDoc(newsDoc(param.id), {
         title: param.title,
         content: param.content,
-        category_id: param.categoryId,
-        created_date: param.createdDate,
+        categoryId: param.categoryId,
+        createdDate: param.createdDate,
       }).catch(() => rejectWithValue("Update news failed"));
     } catch (err) {
       return rejectWithValue("Update news failed");

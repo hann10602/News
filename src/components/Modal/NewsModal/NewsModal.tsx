@@ -1,7 +1,9 @@
 "use client";
 import { categoriesSelector } from "@/store/category/selector";
+import { newsAsyncAction } from "@/store/news/action";
 import { NewsType } from "@/store/news/type";
 import { useAppDispatch } from "@/store/store";
+import { failedNotify } from "@/utils/utils";
 import { CloseRounded } from "@mui/icons-material";
 import {
   Button,
@@ -12,8 +14,10 @@ import {
   Modal,
   Paper,
   Select,
+  TextField,
 } from "@mui/material";
-import { useState } from "react";
+import { serverTimestamp } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
@@ -29,52 +33,58 @@ type Props = {
 const NewsModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
   const categories = useSelector(categoriesSelector);
 
-  const [chooseCategory, setChooseCategory] = useState<String>("");
+  const [chooseCategory, setChooseCategory] = useState<string>("");
+
   const { handleSubmit, control, reset } = useForm();
 
   const dispatch = useAppDispatch();
 
   const onSubmit = async (e: any) => {
-    console.log(e);
     try {
-      // if (item) {
-      //   dispatch(
-      //     newsAsyncAction.update({
-      //       id: item.id,
-      //       title: e.title,
-      //       content: e.content,
-      //       categoryId: e.categoryId,
-      //       createdDate: e.createdDate,
-      //     })
-      //   )
-      //     .then(() => {
-      //       reset();
-      //       onSuccess();
-      //     })
-      //     .catch((err) => {
-      //       failedNotify(err.message);
-      //     });
-      // } else {
-      //   dispatch(
-      //     newsAsyncAction.create({
-      //       title: e.title,
-      //       content: e.content,
-      //       categoryId: e.categoryId,
-      //       createdDate: e.createdDate,
-      //     })
-      //   )
-      //     .then(() => {
-      //       reset();
-      //       onSuccess();
-      //     })
-      //     .catch((err) => {
-      //       failedNotify(err.message);
-      //     });
-      // }
+      if (item) {
+        dispatch(
+          newsAsyncAction.update({
+            id: item.id,
+            title: e.title,
+            content: e.content,
+            categoryId: chooseCategory,
+            createdDate: serverTimestamp(),
+          })
+        )
+          .then(() => {
+            reset();
+            onSuccess();
+          })
+          .catch((err) => {
+            failedNotify(err.message);
+          });
+      } else {
+        dispatch(
+          newsAsyncAction.create({
+            title: e.title,
+            content: e.content,
+            categoryId: chooseCategory,
+            createdDate: serverTimestamp(),
+          })
+        )
+          .then(() => {
+            reset();
+            onSuccess();
+          })
+          .catch((err) => {
+            failedNotify(err.message);
+          });
+      }
     } catch (err) {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    if (item) {
+      setChooseCategory(item.categoryId);
+    }
+  });
 
   return (
     <Modal open={isOpen} className="flex items-center justify-center">
@@ -97,6 +107,7 @@ const NewsModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
               onClick={() => {
                 onClose();
                 reset();
+                setChooseCategory("");
               }}
             >
               <CloseRounded className="text-slate-500 cursor-pointer text-3xl hover:bg-slate-400 hover:bg-opacity-30 rounded-full h-10 w-10 p-1" />
@@ -112,23 +123,32 @@ const NewsModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
             />
           </FormControl>
           <FormControl className="w-full mt-10">
-            <InputLabel>Content:</InputLabel>
             <Controller
               name="content"
               control={control}
               defaultValue={item?.content || ""}
-              render={({ field }) => <Input type="text" required {...field} />}
+              render={({ field }) => (
+                <TextField
+                  type="text"
+                  label="Content"
+                  required
+                  multiline
+                  rows={10}
+                  {...field}
+                />
+              )}
             />
           </FormControl>
           <FormControl className="w-full mt-10">
-            <InputLabel>category:</InputLabel>
+            <InputLabel>Category:</InputLabel>
             <Select
               name="category"
               value={chooseCategory}
+              required
               onChange={(e) => setChooseCategory(e.target.value)}
             >
               {categories.map((category) => (
-                <MenuItem key={category.id} value={category.code}>
+                <MenuItem key={category.id} value={category.id}>
                   {category.name}
                 </MenuItem>
               ))}
@@ -142,6 +162,7 @@ const NewsModal = ({ item, isOpen, onClose, onSuccess }: Props) => {
               onClick={() => {
                 onClose();
                 reset();
+                setChooseCategory("");
               }}
             >
               Cancel
