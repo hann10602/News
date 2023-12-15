@@ -5,22 +5,26 @@ import { newsAsyncAction } from "./action";
 type NewsStateType = {
   isGettingNews: boolean;
   isGettingNewsList: boolean;
+  isGettingNewsLimitTen: boolean;
   isCreatingNews: boolean;
   isUpdatingNews: boolean;
   isDeletingNews: boolean;
   news: NewsType | undefined;
   newsList: NewsType[];
+  newsLimitTen: NewsType[];
   response: ResponseType | undefined;
 };
 
 const initialState: NewsStateType = {
   isGettingNews: false,
   isGettingNewsList: false,
+  isGettingNewsLimitTen: false,
   isCreatingNews: false,
   isUpdatingNews: false,
   isDeletingNews: false,
   news: undefined,
   newsList: [],
+  newsLimitTen: [],
   response: undefined,
 };
 
@@ -53,6 +57,19 @@ const newsSlice = createSlice({
       })
       .addCase(newsAsyncAction.getAll.rejected, (state, err: any) => {
         state.isGettingNewsList = false;
+        throw new Error(err.payload as string);
+      });
+    builder
+      .addCase(newsAsyncAction.getLimitTen.pending, (state) => {
+        state.isGettingNewsLimitTen = true;
+      })
+      .addCase(newsAsyncAction.getLimitTen.fulfilled, (state, action) => {
+        state.newsLimitTen = action.payload as NewsType[];
+
+        state.isGettingNewsLimitTen = false;
+      })
+      .addCase(newsAsyncAction.getLimitTen.rejected, (state, err: any) => {
+        state.isGettingNewsLimitTen = false;
         throw new Error(err.payload as string);
       });
     builder

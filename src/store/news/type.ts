@@ -7,6 +7,7 @@ export type NewsType = {
   createdDate: string;
   category: string;
   categoryId: string;
+  image: string;
 };
 
 export type GetNewsType = {

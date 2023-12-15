@@ -67,7 +67,7 @@ const Header = (props: Props) => {
   };
 
   return (
-    <div className="bg-white">
+    <div className="w-full top-0 bg-white fixed">
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -142,7 +142,7 @@ const Header = (props: Props) => {
             <div
               key={category.id}
               className="cursor-pointer flex justify-center items-center hover:text-red-400"
-              onClick={() => router.push(`category?${category.id}`)}
+              onClick={() => router.push(`category?id=${category.id}`)}
             >
               {category.name}
             </div>

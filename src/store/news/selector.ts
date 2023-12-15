@@ -6,6 +6,9 @@ export const isGettingNewsSelector = (state: RootState) =>
 export const isGettingNewsListSelector = (state: RootState) =>
   state.news.isGettingNewsList;
 
+export const isGettingNewsLimitTenSelector = (state: RootState) =>
+  state.news.isGettingNewsList;
+
 export const isCreatingNewsSelector = (state: RootState) =>
   state.news.isCreatingNews;
 
@@ -18,5 +21,7 @@ export const isDeletingNewsSelector = (state: RootState) =>
 export const newsSelector = (state: RootState) => state.news.news;
 
 export const newsListSelector = (state: RootState) => state.news.newsList;
+export const newsLimitTenSelector = (state: RootState) =>
+  state.news.newsLimitTen;
 
 export const newsResponseSelector = (state: RootState) => state.news.response;

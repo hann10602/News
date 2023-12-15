@@ -6,6 +6,8 @@ import {
   deleteDoc,
   getDoc,
   getDocs,
+  limit,
+  query,
   updateDoc,
 } from "firebase/firestore";
 import { CreateNewsType, DeleteNewsType, UpdateNewsType } from "../news/type";
@@ -42,6 +44,42 @@ const getAll = createAsyncThunk(
               title: doc.data().title,
               content: doc.data().content,
               categoryId: doc.data().categoryId,
+              image: doc.data().image,
+              createdDate: format(
+                doc.data().createdDate.toDate(),
+                "dd/MM/yyyy"
+              ),
+            };
+          })
+        )
+        .catch((err) => rejectWithValue(err));
+
+      return data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+const getLimitTen = createAsyncThunk(
+  "news/get-limit-ten",
+  async (param, { rejectWithValue }) => {
+    try {
+      const q = query(newsCollection, limit(10));
+      const data = await getDocs(q)
+        .then((res) =>
+          res.docs.map((doc) => {
+            const category = getDoc(categoryDoc(doc.data().categoryId)).then(
+              (res) => res.data()?.name
+            );
+
+            return {
+              id: doc.id,
+              category: category,
+              title: doc.data().title,
+              content: doc.data().content,
+              categoryId: doc.data().categoryId,
+              image: doc.data().image,
               createdDate: format(
                 doc.data().createdDate.toDate(),
                 "dd/MM/yyyy"
@@ -103,4 +141,4 @@ const deletes = createAsyncThunk(
   }
 );
 
-export const newsAsyncAction = { getOne, getAll, create, update, deletes };
+export const newsAsyncAction = { getOne, getLimitTen, getAll, create, update, deletes };
