@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/config/firebase";
 import Link from "next/link";
 import "react-toastify/dist/ReactToastify.css";
@@ -29,21 +29,9 @@ const Page = (props: Props) => {
 
   const onSubmit = async (e: any) => {
     try {
-      if (
-        !String(e.email)
-          .toLowerCase()
-          .match(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          )
-      ) {
-        failedNotify("Wrong email format");
-      } else if (!(e.password.length > 5)) {
-        console.log("alo");
-        failedNotify("Password need at least 6 characters");
-      } else {
-        await createUserWithEmailAndPassword(auth, e.email, e.password);
-        router.push("/home", { scroll: true });
-      }
+      await signInWithEmailAndPassword(auth, e.email, e.password)
+        .then((res) => router.push("/home", { scroll: true }))
+        .catch(() => failedNotify("Wrong email or password"));
     } catch (err) {
       console.log(err);
     }

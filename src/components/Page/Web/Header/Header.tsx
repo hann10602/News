@@ -5,10 +5,11 @@ import {
   categoriesSelector,
   isGettingCategoriesSelector,
 } from "@/store/category/selector";
+import AlternateAvatar from "@/assets/img/avatar.jpg";
 import { useAppDispatch } from "@/store/store";
 import { failedNotify, successNotify } from "@/utils/utils";
 import { Home, Person, Search } from "@mui/icons-material";
-import { Button, Input } from "@mui/material";
+import { Avatar, Input } from "@mui/material";
 import { signOut } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,11 +17,13 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
 type Props = {};
 
 const Header = (props: Props) => {
   const [search, setSearch] = useState<string>("");
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -31,7 +34,7 @@ const Header = (props: Props) => {
   const handleLogout = async () => {
     try {
       await signOut(auth)
-        .then(() => successNotify("Logout success"))
+        .then(() => router.push("/login"))
         .catch(() => failedNotify("Logout failed"));
     } catch (err) {
       console.log(err);
@@ -39,7 +42,10 @@ const Header = (props: Props) => {
   };
 
   const handleSearch = () => {
-    router.push(`/search?search=${search}`);
+    if (search !== "") {
+      setSearch("");
+      router.push(`/search?search=${search}`);
+    }
   };
 
   useEffect(() => {
@@ -61,7 +67,7 @@ const Header = (props: Props) => {
         return "Friday";
       case 7:
         return "Saturday";
-      case 8:
+      case 1:
         return "Sunday";
     }
   };
@@ -114,15 +120,56 @@ const Header = (props: Props) => {
           {getDay()} , {new Date().toLocaleDateString()}
         </div>
         <div className="flex justify-center items-center h-8 border-r border-solid border-gray-300 px-5 text-sm font-semibold">
-          <div>
+          <div className="flex">
             <span onClick={() => handleSearch()}>
               <Search className="cursor-pointer text-gray-500" />
             </span>
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1"
+            />
           </div>
         </div>
         {auth.currentUser ? (
-          <div className="flex justify-center text-gray-500 items-center h-8 border-r border-solid border-gray-300 px-3 text-sm font-semibold"></div>
+          <div className="relative flex justify-center text-gray-500 items-center h-8 border-r border-solid border-gray-300 px-3 text-sm font-semibold">
+            <div
+              className="rounded-full cursor-pointer"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {auth.currentUser.photoURL ? (
+                <Image
+                  src={auth.currentUser.photoURL}
+                  alt="avatar"
+                  width={44}
+                  height={44}
+                />
+              ) : (
+                <Image
+                  src={AlternateAvatar}
+                  alt="avatar"
+                  width={44}
+                  height={44}
+                />
+              )}
+            </div>
+            {isMenuOpen && (
+              <div className="absolute top-10 left-0 bg-white border border-solid border-gray-300 w-32">
+                <div
+                  className="p-2 hover:bg-gray-300 cursor-pointer"
+                  onClick={() => router.push("/user")}
+                >
+                  Profile
+                </div>
+                <div
+                  className="p-2 hover:bg-gray-300 cursor-pointer"
+                  onClick={() => handleLogout()}
+                >
+                  Logout
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <Link
             className="cursor-pointer text-gray-600 flex justify-center items-center h-8 border-r border-solid border-gray-300 px-3 text-sm font-semibold"
@@ -142,7 +189,9 @@ const Header = (props: Props) => {
             <div
               key={category.id}
               className="cursor-pointer flex justify-center items-center hover:text-red-400"
-              onClick={() => router.push(`category?id=${category.id}`)}
+              onClick={() =>
+                router.push(`/category/${category.id}/${category.name}`)
+              }
             >
               {category.name}
             </div>

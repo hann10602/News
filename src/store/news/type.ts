@@ -14,6 +14,14 @@ export type GetNewsType = {
   id: string;
 };
 
+export type GetNewsByCategoryType = {
+  categoryId: string;
+};
+
+export type GetNewsBySearchType = {
+  search: string;
+};
+
 export type CreateNewsType = {
   title: string;
   content: string;

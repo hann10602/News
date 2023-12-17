@@ -9,15 +9,37 @@ import {
   limit,
   query,
   updateDoc,
+  where,
 } from "firebase/firestore";
-import { CreateNewsType, DeleteNewsType, UpdateNewsType } from "../news/type";
+import {
+  CreateNewsType,
+  DeleteNewsType,
+  GetNewsByCategoryType,
+  GetNewsBySearchType,
+  GetNewsType,
+  UpdateNewsType,
+} from "../news/type";
 
 const getOne = createAsyncThunk(
   "news/self",
-  async (param, { rejectWithValue }) => {
+  async (param: GetNewsType, { rejectWithValue }) => {
     try {
-      const data = await getDocs(newsCollection)
-        .then((res) => res.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+      const data = await getDoc(newsDoc(param.id))
+        .then((doc) => {
+          const category = getDoc(categoryDoc(doc.data()?.categoryId)).then(
+            (res) => res.data()?.name
+          );
+
+          return {
+            id: doc.id,
+            category: category,
+            title: doc.data()?.title,
+            content: doc.data()?.content,
+            categoryId: doc.data()?.categoryId,
+            image: doc.data()?.image,
+            createdDate: format(doc.data()?.createdDate.toDate(), "dd/MM/yyyy"),
+          };
+        })
         .catch((err) => rejectWithValue(err));
 
       return data;
@@ -96,6 +118,78 @@ const getLimitTen = createAsyncThunk(
   }
 );
 
+const getByCategory = createAsyncThunk(
+  "news/get-by-category",
+  async (param: GetNewsByCategoryType, { rejectWithValue }) => {
+    try {
+      const q = query(
+        newsCollection,
+        where("categoryId", "==", param.categoryId)
+      );
+      const data = await getDocs(q)
+        .then((res) =>
+          res.docs.map((doc) => {
+            const category = getDoc(categoryDoc(doc.data().categoryId)).then(
+              (res) => res.data()?.name
+            );
+
+            return {
+              id: doc.id,
+              category: category,
+              title: doc.data().title,
+              content: doc.data().content,
+              categoryId: doc.data().categoryId,
+              image: doc.data().image,
+              createdDate: format(
+                doc.data().createdDate.toDate(),
+                "dd/MM/yyyy"
+              ),
+            };
+          })
+        )
+        .catch((err) => rejectWithValue(err));
+
+      return data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+const getBySearch = createAsyncThunk(
+  "news/get-by-search",
+  async (param: GetNewsBySearchType, { rejectWithValue }) => {
+    try {
+      const data = await getDocs(newsCollection)
+        .then((res) =>
+          res.docs.map((doc) => {
+            const category = getDoc(categoryDoc(doc.data().categoryId)).then(
+              (res) => res.data()?.name
+            );
+
+            return {
+              id: doc.id,
+              category: category,
+              title: doc.data().title,
+              content: doc.data().content,
+              categoryId: doc.data().categoryId,
+              image: doc.data().image,
+              createdDate: format(
+                doc.data().createdDate.toDate(),
+                "dd/MM/yyyy"
+              ),
+            };
+          })
+        )
+        .catch((err) => rejectWithValue(err));
+
+      return data;
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
 const create = createAsyncThunk(
   "news/create",
   async (param: CreateNewsType, { rejectWithValue }) => {
@@ -141,4 +235,13 @@ const deletes = createAsyncThunk(
   }
 );
 
-export const newsAsyncAction = { getOne, getLimitTen, getAll, create, update, deletes };
+export const newsAsyncAction = {
+  getOne,
+  getLimitTen,
+  getByCategory,
+  getAll,
+  create,
+  getBySearch,
+  update,
+  deletes,
+};

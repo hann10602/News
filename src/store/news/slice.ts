@@ -6,12 +6,16 @@ type NewsStateType = {
   isGettingNews: boolean;
   isGettingNewsList: boolean;
   isGettingNewsLimitTen: boolean;
+  isGettingNewsByCategory: boolean;
+  isGettingNewsBySearch: boolean;
   isCreatingNews: boolean;
   isUpdatingNews: boolean;
   isDeletingNews: boolean;
   news: NewsType | undefined;
   newsList: NewsType[];
   newsLimitTen: NewsType[];
+  newsByCategory: NewsType[];
+  newsBySearch: NewsType[];
   response: ResponseType | undefined;
 };
 
@@ -19,12 +23,16 @@ const initialState: NewsStateType = {
   isGettingNews: false,
   isGettingNewsList: false,
   isGettingNewsLimitTen: false,
+  isGettingNewsByCategory: false,
+  isGettingNewsBySearch: false,
   isCreatingNews: false,
   isUpdatingNews: false,
   isDeletingNews: false,
   news: undefined,
   newsList: [],
   newsLimitTen: [],
+  newsByCategory: [],
+  newsBySearch: [],
   response: undefined,
 };
 
@@ -70,6 +78,32 @@ const newsSlice = createSlice({
       })
       .addCase(newsAsyncAction.getLimitTen.rejected, (state, err: any) => {
         state.isGettingNewsLimitTen = false;
+        throw new Error(err.payload as string);
+      });
+    builder
+      .addCase(newsAsyncAction.getBySearch.pending, (state) => {
+        state.isGettingNewsBySearch = true;
+      })
+      .addCase(newsAsyncAction.getBySearch.fulfilled, (state, action) => {
+        state.newsBySearch = action.payload as NewsType[];
+
+        state.isGettingNewsBySearch = false;
+      })
+      .addCase(newsAsyncAction.getBySearch.rejected, (state, err: any) => {
+        state.isGettingNewsBySearch = false;
+        throw new Error(err.payload as string);
+      });
+    builder
+      .addCase(newsAsyncAction.getByCategory.pending, (state) => {
+        state.isGettingNewsByCategory = true;
+      })
+      .addCase(newsAsyncAction.getByCategory.fulfilled, (state, action) => {
+        state.newsByCategory = action.payload as NewsType[];
+
+        state.isGettingNewsByCategory = false;
+      })
+      .addCase(newsAsyncAction.getByCategory.rejected, (state, err: any) => {
+        state.isGettingNewsByCategory = false;
         throw new Error(err.payload as string);
       });
     builder
