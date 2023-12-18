@@ -1,14 +1,13 @@
 "use client";
-import CategoryModal from "@/components/Modal/CategoryModal/CategoryModal";
 import DeleteModal from "@/components/Modal/DeleteModal/DeleteModal";
+import UserModal from "@/components/Modal/UserModal/UserModal";
 import TableSkeleton from "@/components/Skeleton/TableSkeleton";
 import { categoryAsyncAction } from "@/store/category/action";
-import {
-  categoriesSelector,
-  isGettingCategoriesSelector,
-} from "@/store/category/selector";
-import { CategoryType } from "@/store/category/type";
+import { newsAsyncAction } from "@/store/news/action";
 import { useAppDispatch } from "@/store/store";
+import { userAsyncAction } from "@/store/user/action";
+import { isGettingUsersSelector, usersSelector } from "@/store/user/selector";
+import { UserType } from "@/store/user/type";
 import { failedNotify, successNotify } from "@/utils/utils";
 import {
   Box,
@@ -20,7 +19,7 @@ import {
   TableContainer,
   TableHead,
   TablePagination,
-  TableRow
+  TableRow,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -31,15 +30,15 @@ type Props = {};
 
 const Page = (props: Props) => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
-  const [category, setCategory] = useState<CategoryType | undefined>(undefined);
+  const [user, setUser] = useState<UserType | undefined>(undefined);
   const [page, setPage] = useState<number>(0);
   const [isEditPageOpen, setIsEditPageOpen] = useState<boolean>(false);
   const [isDeletePageOpen, setIsDeletePageOpen] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
 
-  const categories = useSelector(categoriesSelector);
-  const isGettingCategories = useSelector(isGettingCategoriesSelector);
+  const users = useSelector(usersSelector);
+  const isGettingUsers = useSelector(isGettingUsersSelector);
 
   const handlePageChange = (e: unknown, page: number) => {
     setPage(page);
@@ -48,23 +47,23 @@ const Page = (props: Props) => {
   const handleClosePage = () => {
     setIsEditPageOpen(false);
     setIsDeletePageOpen(false);
-    setCategory(undefined);
+    setUser(undefined);
   };
 
   const handleSuccessfully = () => {
-    dispatch(categoryAsyncAction.getAll());
+    dispatch(userAsyncAction.getAll());
     setIsEditPageOpen(false);
-    setCategory(undefined);
+    setUser(undefined);
     successNotify("Success");
   };
 
-  const handleDeleteCategory = () => {
-    if (category) {
-      dispatch(categoryAsyncAction.deletes({ id: category.id }))
+  const handleDeleteUser = () => {
+    if (user) {
+      dispatch(userAsyncAction.deletes({ id: user.id }))
         .then(() => {
-          dispatch(categoryAsyncAction.getAll());
+          dispatch(newsAsyncAction.getAll());
           setIsDeletePageOpen(false);
-          setCategory(undefined);
+          setUser(undefined);
           successNotify("Success");
         })
         .catch((err) => {
@@ -78,6 +77,7 @@ const Page = (props: Props) => {
   };
 
   useEffect(() => {
+    dispatch(userAsyncAction.getAll());
     dispatch(categoryAsyncAction.getAll());
   }, []);
 
@@ -103,7 +103,7 @@ const Page = (props: Props) => {
       >
         Add
       </Button>
-      {isGettingCategories ? (
+      {isGettingUsers ? (
         <TableSkeleton length={10} />
       ) : (
         <Box sx={{ width: "100%" }}>
@@ -114,22 +114,22 @@ const Page = (props: Props) => {
                   <TableRow>
                     <TableCell align="center">Id</TableCell>
                     <TableCell align="center">Name</TableCell>
-                    <TableCell align="center">Code</TableCell>
-                    <TableCell align="center">Product quantity</TableCell>
+                    <TableCell align="center">Email</TableCell>
+                    <TableCell align="center">PhoneNum</TableCell>
                     <TableCell align="center" className="w-48">
                       Options
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {categories
+                  {users
                     .slice(page * rowsPerPage, rowsPerPage * (page + 1))
-                    .map((category) => (
-                      <TableRow key={category.id}>
-                        <TableCell align="center">{category.id}</TableCell>
-                        <TableCell align="center">{category.name}</TableCell>
-                        <TableCell align="center">{category.code}</TableCell>
-                        <TableCell align="center">{category.name}</TableCell>
+                    .map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell align="center">{user.id}</TableCell>
+                        <TableCell align="center">{user.name}</TableCell>
+                        <TableCell align="center">{user.email}</TableCell>
+                        <TableCell align="center">{user.phoneNum}</TableCell>
                         <TableCell
                           align="center"
                           className="w-48 flex items-center justify-center space-x-2"
@@ -138,7 +138,7 @@ const Page = (props: Props) => {
                             variant="contained"
                             className="w-16 bg-green-400 hover:bg-green-300"
                             onClick={() => {
-                              setCategory(category);
+                              setUser(user);
                               setIsEditPageOpen(true);
                             }}
                           >
@@ -148,7 +148,7 @@ const Page = (props: Props) => {
                             variant="contained"
                             className="w-16 bg-red-400 hover:bg-red-300"
                             onClick={() => {
-                              setCategory(category);
+                              setUser(user);
                               setIsDeletePageOpen(true);
                             }}
                           >
@@ -165,25 +165,25 @@ const Page = (props: Props) => {
               rowsPerPage={rowsPerPage}
               component="div"
               onRowsPerPageChange={handleRowsPerPageChange}
-              count={categories.length}
+              count={users.length}
               onPageChange={handlePageChange}
               page={page}
             />
           </Paper>
         </Box>
       )}
-      <CategoryModal
-        item={category}
+      <UserModal
+        item={user}
         isOpen={isEditPageOpen}
         onClose={handleClosePage}
         onSuccess={handleSuccessfully}
       />
-      {category && (
+      {user && (
         <DeleteModal
-          title={`Are you sure to delete ${category.name} category ?`}
+          title={`Are you sure to delete this user ?`}
           isOpen={isDeletePageOpen}
           onClose={handleClosePage}
-          handleDelete={handleDeleteCategory}
+          handleDelete={handleDeleteUser}
         />
       )}
     </div>

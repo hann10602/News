@@ -20,6 +20,7 @@ export const db = getFirestore(app);
 
 export const categoryCollection = collection(db, "category");
 export const newsCollection = collection(db, "news");
+export const userCollection = collection(db, "user");
 
 export const categoryDoc = (id: string) => {
   return doc(db, "category", id);
@@ -27,4 +28,8 @@ export const categoryDoc = (id: string) => {
 
 export const newsDoc = (id: string) => {
   return doc(db, "news", id);
+};
+
+export const userDoc = (id: string) => {
+  return doc(db, "user", id);
 };
