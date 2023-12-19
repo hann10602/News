@@ -1,5 +1,5 @@
 export type UserType = {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phoneNum: string;
@@ -8,28 +8,23 @@ export type UserType = {
 };
 
 export type GetUserType = {
-  id: number;
+  id: string;
 };
 
 export type CreateUserType = {
-  name: string;
   email: string;
-  phoneNum: string;
-  avatar: string;
-  role: number;
+  password: string;
 };
 
 export type UpdateUserType = {
-  id: number;
   name: string;
   email: string;
   phoneNum: string;
   avatar: string;
-  role: number;
 };
 
 export type ChangePasswordUserType = {
-  id: number;
+  id: string;
   newPassword: string;
 };
 

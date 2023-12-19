@@ -36,14 +36,14 @@ const User = (props: Props) => {
           displayName: e.name,
         })
           .then((res) => resolve(res))
-          .catch(() => rejected("name"));
+          .catch(() => rejected("Name"));
       }
     });
     const email = new Promise((resolve, rejected) => {
       if (auth.currentUser) {
         updateEmail(auth.currentUser, e.email)
           .then((res) => resolve(res))
-          .catch((err) => console.log(err));
+          .catch(() => rejected("Email"));
       }
     });
 

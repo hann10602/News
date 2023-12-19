@@ -5,9 +5,19 @@ import {
   DeleteUserType,
   GetUserType,
   UpdateUserType,
+  UserType,
 } from "./type";
-import { getDocs } from "firebase/firestore";
-import { userCollection } from "@/config/firebase";
+import {
+  addDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { auth, userCollection, userDoc } from "@/config/firebase";
+import { updateEmail, updatePassword, updateProfile } from "firebase/auth";
+import { failedNotify, successNotify } from "@/utils/utils";
 
 const getOne = createAsyncThunk(
   "user/self",
@@ -48,17 +58,10 @@ const create = createAsyncThunk(
   "user/create",
   async (param: CreateUserType, { rejectWithValue }) => {
     try {
-      //   const resp = await baseAxios
-      //     .post(`/auth/register`, param)
-      //     .then((res) => res)
-      //     .catch((err) => err);
-      //   if (resp.code === "ERR_NETWORK") {
-      //     return rejectWithValue(resp);
-      //   } else if (resp.status === 200) {
-      //     return resp.data;
-      //   } else if (resp.code !== "ERR_NETWORK") {
-      //     return rejectWithValue(resp);
-      //   }
+      addDoc(userCollection, {
+        email: param.email,
+        password: param.password,
+      }).catch((err) => rejectWithValue(err));
     } catch (err) {
       return rejectWithValue(err);
     }
@@ -69,17 +72,26 @@ const update = createAsyncThunk(
   "user/update",
   async (param: UpdateUserType, { rejectWithValue }) => {
     try {
-      //   const resp = await baseAxios
-      //     .put(`/user/update`, param)
-      //     .then((res) => res)
-      //     .catch((err) => err);
-      //   if (resp.code === "ERR_NETWORK") {
-      //     return rejectWithValue(resp);
-      //   } else if (resp.status === 200) {
-      //     return resp.data;
-      //   } else if (resp.code !== "ERR_NETWORK") {
-      //     return rejectWithValue(resp);
-      //   }
+      const q = query(userCollection, where("email", "==", param.email));
+      await new Promise((resolve) => {
+        onSnapshot(q, (snapshot) => {
+          const users: UserType[] = [];
+          snapshot.docs.forEach((doc) => {
+            users.push({ ...doc.data(), id: doc.id } as UserType);
+          });
+
+          resolve(users);
+        });
+      }).then((res) => {
+        if ((res as UserType[]).length <= 1) {
+          updateDoc(userDoc((res as UserType[])[0].id), {
+            name: param.name,
+            avatar: param.avatar,
+            email: param.email,
+            phoneNum: param.phoneNum,
+          }).catch((err) => rejectWithValue(err));
+        }
+      });
     } catch (err) {
       return rejectWithValue(err);
     }
