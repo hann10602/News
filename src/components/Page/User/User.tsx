@@ -1,6 +1,13 @@
 "use client";
 import { auth } from "@/config/firebase";
+import { failedNotify, successNotify } from "@/utils/utils";
 import { Button, FormControl, Input, InputLabel } from "@mui/material";
+import {
+  updateEmail,
+  updatePassword,
+  updatePhoneNumber,
+  updateProfile,
+} from "firebase/auth";
 import firebase from "firebase/compat/app";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -23,9 +30,38 @@ const User = (props: Props) => {
   //   }
 
   const onSubmit = (e: any) => {
-    firebase.auth().currentUser?.updateProfile({
-      displayName: e.name,
+    const profile = new Promise((resolve, rejected) => {
+      if (auth.currentUser) {
+        updateProfile(auth.currentUser, {
+          displayName: e.name,
+        })
+          .then((res) => resolve(res))
+          .catch(() => rejected("Name"));
+      }
     });
+    const email = new Promise((resolve, rejected) => {
+      if (auth.currentUser) {
+        updateEmail(auth.currentUser, e.email)
+          .then((res) => resolve(res))
+          .catch(() => rejected("Email"));
+      }
+    });
+
+    Promise.all([profile, email])
+      .then(() => successNotify("Update user successfully"))
+      .catch((err) => failedNotify(err));
+  };
+
+  const onChangePassword = (e: any) => {
+    if (auth.currentUser) {
+      if (e.password === e.confirmPassword) {
+        updatePassword(auth.currentUser, e.password)
+          .then(() => successNotify("Update password successfully"))
+          .catch(() => failedNotify("Update password failed"));
+      } else {
+        failedNotify("Passwords don not match");
+      }
+    }
   };
 
   return (
@@ -73,6 +109,31 @@ const User = (props: Props) => {
         <div className="flex justify-end mt-10">
           <Button type="submit" variant="contained" className="bg-[#3D8BD9]">
             Update
+          </Button>
+        </div>
+      </form>
+      <form onSubmit={handleSubmit(onChangePassword)}>
+        <FormControl className="w-full mt-10">
+          <InputLabel>Password:</InputLabel>
+          <Controller
+            name="password"
+            control={control}
+            defaultValue={""}
+            render={({ field }) => <Input type="text" required {...field} />}
+          />
+        </FormControl>
+        <FormControl className="w-full mt-10">
+          <InputLabel>Confirm password:</InputLabel>
+          <Controller
+            name="confirmPassword"
+            control={control}
+            defaultValue={""}
+            render={({ field }) => <Input type="text" required {...field} />}
+          />
+        </FormControl>
+        <div className="flex justify-end mt-10">
+          <Button type="submit" variant="contained" className="bg-[#3D8BD9]">
+            Change password
           </Button>
         </div>
       </form>

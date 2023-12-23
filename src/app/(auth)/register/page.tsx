@@ -16,12 +16,16 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { failedNotify } from "@/utils/utils";
 import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/store/store";
+import { userAsyncAction } from "@/store/user/action";
 
 type Props = {};
 
 const Page = (props: Props) => {
   const { handleSubmit, control } = useForm();
   const router = useRouter();
+
+  const dispatch = useAppDispatch();
 
   const onSubmit = async (e: any) => {
     try {
@@ -36,8 +40,17 @@ const Page = (props: Props) => {
       } else if (!(e.password.length > 5)) {
         failedNotify("Password need at least 6 characters");
       } else {
-        await createUserWithEmailAndPassword(auth, e.email, e.password);
-        router.push("/login", { scroll: false });
+        await createUserWithEmailAndPassword(auth, e.email, e.password)
+          .then(() => {
+            router.push("/login", { scroll: false });
+            dispatch(
+              userAsyncAction.create({
+                email: e.email,
+                password: e.password,
+              })
+            );
+          })
+          .catch((err) => failedNotify(err));
       }
     } catch (err) {
       console.log(err);

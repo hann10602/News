@@ -1,23 +1,23 @@
 "use client";
+import AlternateAvatar from "@/assets/img/avatar.jpg";
 import { auth } from "@/config/firebase";
 import { categoryAsyncAction } from "@/store/category/action";
 import {
   categoriesSelector,
   isGettingCategoriesSelector,
 } from "@/store/category/selector";
-import AlternateAvatar from "@/assets/img/avatar.jpg";
 import { useAppDispatch } from "@/store/store";
-import { failedNotify, successNotify } from "@/utils/utils";
+import { failedNotify } from "@/utils/utils";
 import { Home, Person, Search } from "@mui/icons-material";
-import { Avatar, Input } from "@mui/material";
+import { Input } from "@mui/material";
 import { signOut } from "firebase/auth";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Image from "next/image";
 
 type Props = {};
 
