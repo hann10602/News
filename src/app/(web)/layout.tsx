@@ -1,9 +1,10 @@
-import Header from "@/components/Page/Web/Header/Header";
 import Background from "@/assets/img/background.jpg";
+import ChatBox from "@/components/Page/ChatBox/ChatBox";
+import Footer from "@/components/Page/Web/Footer/Footer";
+import Header from "@/components/Page/Web/Header/Header";
 import { Metadata } from "next";
 import Image from "next/image";
 import React from "react";
-import Footer from "@/components/Page/Web/Footer/Footer";
 
 type Props = {
   children: React.ReactNode;
@@ -23,6 +24,7 @@ const layout = ({ children }: Props) => {
         className="w-full object-cover -z-10 fixed top-0"
         alt=""
       />
+      <ChatBox />
       <div className="mt-[110px] flex justify-center">
         <div className="w-[1400px] bg-white flex flex-col justify-between">
           {children}
