@@ -196,6 +196,12 @@ const Header = (props: Props) => {
               {category.name}
             </div>
           ))}
+        <div
+          className="cursor-pointer flex justify-center items-center hover:text-red-400"
+          onClick={() => router.push(`/integrate-news`)}
+        >
+          Integrate News
+        </div>
       </div>
     </div>
   );
