@@ -3,7 +3,7 @@ import { failedNotify } from "@/utils/utils";
 import { Close, Send, Sms } from "@mui/icons-material";
 import { Paper, Typography } from "@mui/material";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import AiBot from "@/assets/img/AI-bot-1.jpg";
 import Image from "next/image";
@@ -21,25 +21,31 @@ const ChatBox = (props: Props) => {
   const [isChatBoxOpen, setIsChatBoxOpen] = useState<boolean>(false);
   const [chatList, setChatList] = useState<ChatItem[]>([]);
 
+  const chatInputRef = useRef<HTMLInputElement>(null);
+
   const handleChatSubmit = async () => {
+    setChatList((prev) => [
+      ...prev,
+      { role: "USER", content: chatContent, id: uuidv4() },
+    ]);
+    setChatContent("");
+
     const url = "https://api.openai.com/v1/chat/completions";
     const headers = {
       "Content-type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      Authorization: `Bearer`,
     };
     const data = {
       model: "gpt-3.5-turbo-0301",
-      messages: [{ role: "user", content: chatContent }],
+      messages: [{ role: "user", content: chatContent.trim() }],
       temperature: 0.7,
     };
 
     await axios
       .post(url, data, { headers: headers })
       .then((res) => {
-        setChatContent("");
         setChatList((prev) => [
           ...prev,
-          { role: "USER", content: chatContent, id: uuidv4() },
           {
             role: "SYSTEM",
             content: res.data.choices[0].message.content,
@@ -47,7 +53,22 @@ const ChatBox = (props: Props) => {
           },
         ]);
       })
-      .catch(() => failedNotify("Send message failed"));
+      .catch(() =>
+        setChatList((prev) => [
+          ...prev,
+          {
+            role: "SYSTEM",
+            content: "Send message failed",
+            id: uuidv4(),
+          },
+        ])
+      );
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && chatContent.trim() !== "") {
+      handleChatSubmit();
+    }
   };
 
   return (
@@ -92,7 +113,9 @@ const ChatBox = (props: Props) => {
           </div>
           <div className="flex p-3 border-t border-solid border-gray-300 items-center">
             <input
+              ref={chatInputRef}
               type="text"
+              onKeyDown={handleKeyDown}
               value={chatContent}
               onChange={(e) => setChatContent(e.target.value)}
               className="flex-1 h-10 rounded-full outline-none px-3 border border-solid border-gray-300 mr-4"
@@ -100,7 +123,7 @@ const ChatBox = (props: Props) => {
             />
             <Send
               className="cursor-pointer text-gray-500 hover:text-gray-400"
-              onClick={() => handleChatSubmit()}
+              onClick={() => chatContent.trim() !== "" && handleChatSubmit()}
             />
           </div>
         </Paper>
