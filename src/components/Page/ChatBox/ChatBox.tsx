@@ -1,12 +1,11 @@
 "use client";
-import { failedNotify } from "@/utils/utils";
-import { Close, Send, Sms } from "@mui/icons-material";
+import AiBot from "@/assets/img/AI-bot-1.jpg";
+import { Close, MoreHoriz, Send, Sms } from "@mui/icons-material";
 import { Paper, Typography } from "@mui/material";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import AiBot from "@/assets/img/AI-bot-1.jpg";
 import Image from "next/image";
+import { useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 type ChatItem = {
   id: string;
@@ -19,6 +18,7 @@ type Props = {};
 const ChatBox = (props: Props) => {
   const [chatContent, setChatContent] = useState<string>("");
   const [isChatBoxOpen, setIsChatBoxOpen] = useState<boolean>(false);
+  const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
   const [chatList, setChatList] = useState<ChatItem[]>([]);
 
   const chatInputRef = useRef<HTMLInputElement>(null);
@@ -29,11 +29,12 @@ const ChatBox = (props: Props) => {
       { role: "USER", content: chatContent, id: uuidv4() },
     ]);
     setChatContent("");
+    setIsChatLoading(true);
 
     const url = "https://api.openai.com/v1/chat/completions";
     const headers = {
       "Content-type": "application/json",
-      Authorization: `Bearer`,
+      Authorization: `Bearer sk`,
     };
     const data = {
       model: "gpt-3.5-turbo-0301",
@@ -63,6 +64,8 @@ const ChatBox = (props: Props) => {
           },
         ])
       );
+
+    setIsChatLoading(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -110,6 +113,22 @@ const ChatBox = (props: Props) => {
                 </Typography>
               </div>
             ))}
+            {isChatLoading && (
+              <div className={`flex justify-start mb-5`}>
+                <Image
+                  className="w-10 h-10 rounded-full"
+                  src={AiBot}
+                  alt="ai bot"
+                  width={24}
+                  height={24}
+                />
+                <Typography
+                  className={`max-w-[70%] border border-solid border-gray-400 rounded-md p-2`}
+                >
+                  <MoreHoriz />
+                </Typography>
+              </div>
+            )}
           </div>
           <div className="flex p-3 border-t border-solid border-gray-300 items-center">
             <input
